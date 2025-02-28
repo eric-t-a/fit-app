@@ -1,74 +1,112 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { Image, StyleSheet, Platform, View, TouchableOpacity, Text, StatusBar } from 'react-native';
+import Map, { MapPolyline } from 'react-native-maps';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import useLocation from '@/hooks/useLocation';
+import React, { useEffect, useRef } from 'react';
+import useRunning from '@/hooks/useRunning';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import RunningInfo from '@/components/RunningInfo';
 
 export default function HomeScreen() {
+  const { currentPosition, errorMsg} = useLocation();
+  const mapRef : any = React.createRef();
+  const { runningInfo, runningHistory, startRunning, appendCoordinates, stopRunning, runningTime } = useRunning();
+  const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    mapRef.current.animateToRegion({
+      latitude: currentPosition.latitude + 0.002,
+      longitude: currentPosition.longitude,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01
+    })
+  },[currentPosition.latitude, currentPosition.longitude]);
+
+  function startStopRun(){
+    if(runningInfo.isRunning){ 
+      stopRunning();
+      return;
+    }
+    startRunning(currentPosition);
+  }
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={{flex: 1}}>
+    
+      <View style={{...styles.container, paddingTop: insets.top}}>
+
+        <RunningInfo runningTime={runningTime}/>
+        
+        <Map 
+          ref={mapRef}
+          style={styles.map}
+          initialRegion={{
+            latitude: currentPosition.latitude,
+            longitude: currentPosition.longitude,
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005
+          }}
+        >
+          <MapPolyline 
+            strokeWidth={4}
+            strokeColor="#ff0000"
+            coordinates={[currentPosition,{latitude: currentPosition.latitude + 1, longitude: currentPosition.longitude + 1}]}
+          />
+        </Map>
+        <TouchableOpacity 
+          style={styles.button} 
+          activeOpacity={0.6} 
+          onPress={() => startStopRun()}
+        >
+          <Text style={styles.buttonTitle}>
+            {runningInfo.isRunning ? "Finish" : "Start"}
+          </Text>
+        </TouchableOpacity>
+      </View> 
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    position: "relative",
+    backgroundColor: '#000',
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  map: {
+    height: '100%'
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
+  infoContainer: {
+    flex: 1,
+    height: '30%',
+    backgroundColor: "#000",
+    position: "absolute",
     left: 0,
-    position: 'absolute',
+    right: 0,
+    borderBottomRightRadius: 17,
+    borderBottomLeftRadius: 17,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
   },
+  infoText: { 
+    color: "#fff"
+  },
+  button: {
+    flex: 1,
+    height: 56,
+    backgroundColor: "#000",
+    position: "absolute",
+    bottom: 40,
+    left: 24,
+    right: 24,
+    borderRadius: 7,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  buttonTitle: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16
+  }
 });
