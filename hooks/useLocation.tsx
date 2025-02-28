@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
+import { shouldUpdateCoordinates } from "@/utils/helper";
 
 const LOCATION_TASK_NAME = 'background-location-task';
 
@@ -19,8 +20,9 @@ const useLocation = () => {
         if(isDev){
             Location.watchPositionAsync({accuracy: Location.Accuracy.BestForNavigation}, ({ coords }) => {
                 const { accuracy, latitude, longitude } = coords;
-                setCurrentPosition({latitude, longitude});
-
+                if(shouldUpdateCoordinates(accuracy, {latitude, longitude}, currentPosition)){
+                    setCurrentPosition({latitude, longitude});
+                }
             });
         }
         await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
