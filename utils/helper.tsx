@@ -1,10 +1,6 @@
 import { LatLng } from "react-native-maps";
 
-function timeRunning(start_time: Date | null){
-    if(!start_time) return '00:00';
-
-    const totalSec = getTimeDiffInSeconds(start_time, new Date());
-
+function formatTime(totalSec: number){
     const hours = Math.floor(totalSec / 60 / 60);
     const hh = ('0' + hours).slice(-2);
 
@@ -16,6 +12,13 @@ function timeRunning(start_time: Date | null){
 
     if(hh != '00') return `${hh}:${mm}:${ss}`;
     return `${mm}:${ss}`;
+}
+function timeRunning(start_time: Date | null){
+    if(!start_time) return '00:00';
+
+    const totalSec = getTimeDiffInSeconds(start_time, new Date());
+
+    return formatTime(totalSec);
 }
 function deg2rad(deg: number) {
     return deg * (Math.PI/180)
@@ -82,5 +85,27 @@ function calculateCalories(distance: number, time: number, weight: number){ // m
 
     return mets * weight * time / 60;
 }
+function getPace(distance: number, start_time: Date){
+    if(!start_time) return '00:00';
+    const pace = calculatePace(distance, start_time);
 
-export { timeRunning, shouldUpdateCoordinates, getDistanceFromLatLonInMeters, floatTo1Decimal, floatTo2Decimal, calculateCalories }
+    return formatTime(pace);
+}
+function calculatePace(distance: number, start_time: Date){
+    const timeDeltaSeconds = Math.floor(((new Date()).getTime() - start_time.getTime()) / 1000);
+    const timeDeltaMin = timeDeltaSeconds / 60;
+    const distanceKm = distance / 1000;
+
+    return Math.floor(timeDeltaMin / distanceKm);
+
+}
+
+export { 
+    timeRunning, 
+    shouldUpdateCoordinates, 
+    getDistanceFromLatLonInMeters, 
+    floatTo1Decimal, 
+    floatTo2Decimal, 
+    calculateCalories,
+    getPace
+}
