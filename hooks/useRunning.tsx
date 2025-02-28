@@ -1,14 +1,17 @@
-import { floatTo1Decimal, getDistanceFromLatLonInMeters, timeRunning } from "@/utils/helper";
+import { calculateCalories, floatTo1Decimal, getDistanceFromLatLonInMeters, timeRunning } from "@/utils/helper";
 import { getData, storeData } from "@/utils/storage";
 import { useEffect, useState } from "react";
 import { LatLng } from "react-native-maps";
 
-interface RunningInfo {
+interface Coordinates extends LatLng {
+    time: Date;
+}
+export interface RunningInfo {
     isRunning: boolean;
     start_time: null | Date;
     end_time: null | Date;
     calories: number;
-    coordinates: LatLng[];
+    coordinates: Coordinates[];
     distance: number; // meters
 }
 
@@ -47,7 +50,7 @@ const useRunning = () => {
             ...runningInfo, 
             isRunning: true, 
             start_time: new Date(), 
-            coordinates: [coord]
+            coordinates: [{...coord, time: new Date()}]
         });
     }
 
@@ -62,17 +65,24 @@ const useRunning = () => {
 
     function appendCoordinates(coord: LatLng){
         let deltaDistance = 0;
+        let deltaCalories = 0;
+        const timeNow = new Date();
         if(runningInfo.coordinates.length){
             const lastCoord = runningInfo.coordinates[runningInfo.coordinates.length - 1];
+            const deltaTime = Math.floor((lastCoord.time.getTime() - timeNow.getTime()) / 1000); // seconds
+
             deltaDistance = getDistanceFromLatLonInMeters(lastCoord.latitude, lastCoord.longitude, coord.latitude, coord.longitude);
             deltaDistance = floatTo1Decimal(deltaDistance)
+
+            deltaCalories = calculateCalories(deltaDistance, deltaTime, 70);
         }
         setRunningInfo({
             ...runningInfo, 
+            calories: runningInfo.calories + deltaCalories,
             distance: runningInfo.distance + deltaDistance,
             isRunning: true, 
-            start_time: new Date(), 
-            coordinates: [...runningInfo.coordinates, coord]
+            start_time: timeNow, 
+            coordinates: [...runningInfo.coordinates, {...coord, time: new Date()}]
         });
     }
 

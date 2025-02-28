@@ -1,14 +1,13 @@
-import useRunning from "@/hooks/useRunning";
+import useRunning, { RunningInfo } from "@/hooks/useRunning";
 import { floatTo2Decimal, timeRunning } from "@/utils/helper";
 import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-interface RunningInfoProps {
+interface RunningInfoProps extends RunningInfo{
     runningTime: string;
-    distance: number; // meters
 }
 
-const RunningInfo = ({ runningTime, distance }: RunningInfoProps) => {
+const RunningInfoView = ({ runningTime, distance, calories }: RunningInfoProps) => {
     const insets = useSafeAreaInsets();
 
     return(
@@ -29,7 +28,7 @@ const RunningInfo = ({ runningTime, distance }: RunningInfoProps) => {
             </View>
             <View style={styles.infoBlock}>
                 <Text style={{...styles.infoTextValue, ...styles.infoText}}>
-                    0
+                    {calories}
                 </Text>
                 <Text style={styles.infoText}>
                     kcal
@@ -88,4 +87,4 @@ const styles = StyleSheet.create({
     }
   });
 
-  export default RunningInfo;
+  export default RunningInfoView;

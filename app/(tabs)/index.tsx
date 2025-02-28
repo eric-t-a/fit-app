@@ -5,7 +5,7 @@ import useLocation from '@/hooks/useLocation';
 import React, { useEffect, useRef } from 'react';
 import useRunning from '@/hooks/useRunning';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import RunningInfo from '@/components/RunningInfo';
+import RunningInfoView from '@/components/RunningInfo';
 import { getData } from '@/utils/storage';
 
 export default function HomeScreen() {
@@ -42,7 +42,7 @@ export default function HomeScreen() {
     
       <View style={{...styles.container, paddingTop: insets.top}}>
 
-        <RunningInfo runningTime={runningTime} distance={runningInfo.distance}/>
+        <RunningInfoView runningTime={runningTime} distance={runningInfo.distance} calories={runningInfo.calories}/>
         
         <Map 
           ref={mapRef}

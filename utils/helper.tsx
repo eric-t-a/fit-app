@@ -57,4 +57,30 @@ function floatTo2Decimal(number: number){
     return floatToNDecimal(number, 2);
 }
 
-export { timeRunning, shouldUpdateCoordinates, getDistanceFromLatLonInMeters, floatTo1Decimal, floatTo2Decimal }
+function getSpeedThroughUSPace(pace: number){
+    return 100 * 1.60934 / (pace * 6)
+}
+
+function getMets(speed: number){ // m/s
+    if(speed > getSpeedThroughUSPace(6)) return 15;
+    if(speed > getSpeedThroughUSPace(7)) return 13;
+    if(speed > getSpeedThroughUSPace(8)) return 11.5;
+    if(speed > getSpeedThroughUSPace(9)) return 10;
+    if(speed > getSpeedThroughUSPace(10)) return 9;
+    if(speed > getSpeedThroughUSPace(12)) return 7;
+    if(speed > getSpeedThroughUSPace(13.5)) return 5.5;
+    if(speed > getSpeedThroughUSPace(15)) return 4;
+    if(speed > getSpeedThroughUSPace(17)) return 2.8;
+    if(speed > getSpeedThroughUSPace(20)) return 2.3;
+    if(speed > getSpeedThroughUSPace(30)) return 1.5;
+    return 1;
+}
+
+function calculateCalories(distance: number, time: number, weight: number){ // meters, seconds and kg
+    const speed = distance / time;
+    const mets = getMets(speed);
+
+    return mets * weight * time / 60;
+}
+
+export { timeRunning, shouldUpdateCoordinates, getDistanceFromLatLonInMeters, floatTo1Decimal, floatTo2Decimal, calculateCalories }
