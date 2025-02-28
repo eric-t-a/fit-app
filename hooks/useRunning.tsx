@@ -1,4 +1,4 @@
-import { timeRunning } from "@/utils/helper";
+import { floatTo1Decimal, getDistanceFromLatLonInMeters, timeRunning } from "@/utils/helper";
 import { getData, storeData } from "@/utils/storage";
 import { useEffect, useState } from "react";
 import { LatLng } from "react-native-maps";
@@ -9,11 +9,12 @@ interface RunningInfo {
     end_time: null | Date;
     calories: number;
     coordinates: LatLng[];
+    distance: number; // meters
 }
 
 var timerInterval: any = null;
 
-const runningEmptyState = { isRunning: false, start_time: null, end_time: null, calories: 0, coordinates: [] } ;
+const runningEmptyState = { isRunning: false, start_time: null, end_time: null, calories: 0, coordinates: [], distance: 0 } ;
 
 const useRunning = () => {
     const [runningInfo, setActiveRunningState] = useState<RunningInfo>(runningEmptyState);
@@ -24,7 +25,7 @@ const useRunning = () => {
         const history = await getData('runningHistory');
         setHistoryState(history);
     }
-    
+
     useEffect(() => {
         setupHistory();
     },[])
@@ -60,8 +61,15 @@ const useRunning = () => {
     }
 
     function appendCoordinates(coord: LatLng){
+        let deltaDistance = 0;
+        if(runningInfo.coordinates.length){
+            const lastCoord = runningInfo.coordinates[runningInfo.coordinates.length - 1];
+            deltaDistance = getDistanceFromLatLonInMeters(lastCoord.latitude, lastCoord.longitude, coord.latitude, coord.longitude);
+            deltaDistance = floatTo1Decimal(deltaDistance)
+        }
         setRunningInfo({
             ...runningInfo, 
+            distance: runningInfo.distance + deltaDistance,
             isRunning: true, 
             start_time: new Date(), 
             coordinates: [...runningInfo.coordinates, coord]

@@ -47,4 +47,14 @@ function getTimeDiffInSeconds(start_date: Date, final_date: Date) {
     return (final_date.getTime() - start_date.getTime()) / 1000
 }
 
-export { timeRunning, shouldUpdateCoordinates }
+function floatToNDecimal(number: number, n: number){
+    return parseFloat(number.toFixed(n));
+}
+function floatTo1Decimal(number: number){
+    return floatToNDecimal(number, 1);
+}
+function floatTo2Decimal(number: number){
+    return floatToNDecimal(number, 2);
+}
+
+export { timeRunning, shouldUpdateCoordinates, getDistanceFromLatLonInMeters, floatTo1Decimal, floatTo2Decimal }

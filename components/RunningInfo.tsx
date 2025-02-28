@@ -1,13 +1,14 @@
 import useRunning from "@/hooks/useRunning";
-import { timeRunning } from "@/utils/helper";
+import { floatTo2Decimal, timeRunning } from "@/utils/helper";
 import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface RunningInfoProps {
     runningTime: string;
+    distance: number; // meters
 }
 
-const RunningInfo = ({ runningTime }: RunningInfoProps) => {
+const RunningInfo = ({ runningTime, distance }: RunningInfoProps) => {
     const insets = useSafeAreaInsets();
 
     return(
@@ -20,7 +21,7 @@ const RunningInfo = ({ runningTime }: RunningInfoProps) => {
           <View style={styles.infoStats}>
             <View style={styles.infoBlock}>
                 <Text style={{...styles.infoTextValue, ...styles.infoText}}>
-                    0
+                    {floatTo2Decimal(distance / 1000)}
                 </Text>
                 <Text style={styles.infoText}>
                     km
