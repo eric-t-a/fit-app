@@ -1,5 +1,5 @@
 import { timeRunning } from "@/utils/helper";
-import { storeData } from "@/utils/storage";
+import { getData, storeData } from "@/utils/storage";
 import { useEffect, useState } from "react";
 import { LatLng } from "react-native-maps";
 
@@ -19,6 +19,15 @@ const useRunning = () => {
     const [runningInfo, setActiveRunningState] = useState<RunningInfo>(runningEmptyState);
     const [runningHistory, setHistoryState] = useState<RunningInfo[]>([]);
     const [runningTime, setRunningTime] = useState('00:00');
+
+    async function setupHistory(){
+        const history = await getData('runningHistory');
+        setHistoryState(history);
+    }
+    
+    useEffect(() => {
+        setupHistory();
+    },[])
 
     function setRunningInfo(info: RunningInfo){
         setActiveRunningState({...info});

@@ -10,7 +10,8 @@ const isDev = true;
 
 const useLocation = () => {
     const [errorMsg, setErrorMsg] = useState('');
-    const [currentPosition, setCurrentPosition] = useState({latitude: 0, longitude: 0})
+    const [currentPosition, setCurrentPosition] = useState({latitude: 0, longitude: 0});
+    var curPos = {latitude: 0, longitude: 0};
 
     const getUserLocation = async () => {
         const { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
@@ -20,8 +21,9 @@ const useLocation = () => {
         if(isDev){
             Location.watchPositionAsync({accuracy: Location.Accuracy.BestForNavigation}, ({ coords }) => {
                 const { accuracy, latitude, longitude } = coords;
-                if(shouldUpdateCoordinates(accuracy, {latitude, longitude}, currentPosition)){
+                if(shouldUpdateCoordinates(accuracy, {latitude, longitude}, curPos)){
                     setCurrentPosition({latitude, longitude});
+                    curPos = {latitude, longitude};
                 }
             });
         }

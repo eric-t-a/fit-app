@@ -6,6 +6,7 @@ import React, { useEffect, useRef } from 'react';
 import useRunning from '@/hooks/useRunning';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import RunningInfo from '@/components/RunningInfo';
+import { getData } from '@/utils/storage';
 
 export default function HomeScreen() {
   const { currentPosition, errorMsg} = useLocation();
@@ -13,14 +14,20 @@ export default function HomeScreen() {
   const { runningInfo, runningHistory, startRunning, appendCoordinates, stopRunning, runningTime } = useRunning();
   const insets = useSafeAreaInsets();
 
+
   useEffect(() => {
     mapRef.current.animateToRegion({
-      latitude: currentPosition.latitude + 0.002,
+      latitude: currentPosition.latitude + 0.0001,
       longitude: currentPosition.longitude,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01
+      latitudeDelta: 0.001,
+      longitudeDelta: 0.001
     })
   },[currentPosition.latitude, currentPosition.longitude]);
+
+  useEffect(() => {
+    if(runningInfo.isRunning) appendCoordinates(currentPosition);
+    
+  }, [runningInfo.isRunning, currentPosition])
 
   function startStopRun(){
     if(runningInfo.isRunning){ 
@@ -50,7 +57,7 @@ export default function HomeScreen() {
           <MapPolyline 
             strokeWidth={4}
             strokeColor="#ff0000"
-            coordinates={[currentPosition,{latitude: currentPosition.latitude + 1, longitude: currentPosition.longitude + 1}]}
+            coordinates={[...runningInfo.coordinates]}
           />
         </Map>
         <TouchableOpacity 
