@@ -26,7 +26,7 @@ const useRunning = () => {
 
     async function setupHistory(){
         const history = await getData('runningHistory');
-        setHistoryState(history);
+        setHistoryState(history ?? []);
     }
 
     useEffect(() => {
@@ -69,7 +69,7 @@ const useRunning = () => {
         const timeNow = new Date();
         if(runningInfo.coordinates.length){
             const lastCoord = runningInfo.coordinates[runningInfo.coordinates.length - 1];
-            const deltaTime = Math.floor((lastCoord.time.getTime() - timeNow.getTime()) / 1000); // seconds
+            const deltaTime = Math.floor((timeNow.getTime() - lastCoord.time.getTime()) / 1000); // seconds
 
             deltaDistance = getDistanceFromLatLonInMeters(lastCoord.latitude, lastCoord.longitude, coord.latitude, coord.longitude);
             deltaDistance = floatTo1Decimal(deltaDistance)
@@ -78,7 +78,7 @@ const useRunning = () => {
         }
         setRunningInfo({
             ...runningInfo, 
-            calories: runningInfo.calories + deltaCalories,
+            calories: runningInfo.calories + Math.floor(deltaCalories),
             distance: runningInfo.distance + deltaDistance,
             isRunning: true, 
             start_time: timeNow, 

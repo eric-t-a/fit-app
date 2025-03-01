@@ -27,9 +27,9 @@ const useLocation = () => {
                 }
             });
         }
-        await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-            accuracy: Location.Accuracy.BestForNavigation,
-        });
+        // await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+        //     accuracy: Location.Accuracy.BestForNavigation,
+        // });
     };
 
     useEffect(() => {
@@ -39,14 +39,14 @@ const useLocation = () => {
     return { currentPosition, errorMsg};
 }
 
-TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
-    if (error) {
-      return;
-    }
-    if (data) {
-      const { locations } = data;
-      console.log(locations)
-    }
-});
+// TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }) => {
+//     if (error) {
+//       return;
+//     }
+//     if (data) {
+//       const { locations } = data;
+//       console.log(locations)
+//     }
+// });
 
 export default useLocation;

@@ -1,5 +1,5 @@
 import { Image, StyleSheet, Platform, View, TouchableOpacity, Text, StatusBar } from 'react-native';
-import Map, { MapPolyline } from 'react-native-maps';
+import Map, { MapPolyline, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import useLocation from '@/hooks/useLocation';
 import React, { useEffect, useRef } from 'react';
@@ -9,7 +9,7 @@ import RunningInfoView from '@/components/RunningInfo';
 import { getData } from '@/utils/storage';
 
 export default function HomeScreen() {
-  const { currentPosition, errorMsg} = useLocation();
+  const { currentPosition, errorMsg } = useLocation();
   const mapRef : any = React.createRef();
   const { runningInfo, runningHistory, startRunning, appendCoordinates, stopRunning, runningTime } = useRunning();
   const insets = useSafeAreaInsets();
@@ -47,6 +47,7 @@ export default function HomeScreen() {
         <Map 
           ref={mapRef}
           style={styles.map}
+          provider={PROVIDER_GOOGLE}
           initialRegion={{
             latitude: currentPosition.latitude,
             longitude: currentPosition.longitude,
