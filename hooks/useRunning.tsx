@@ -1,4 +1,4 @@
-import { calculateCalories, floatTo1Decimal, getDistanceFromLatLonInMeters, timeRunning } from "@/utils/helper";
+import { calculateCalories, floatTo1Decimal, getDistanceFromLatLonInMeters, getPace, timeRunning } from "@/utils/helper";
 import { getData, storeData } from "@/utils/storage";
 import { useEffect, useState } from "react";
 import { LatLng } from "react-native-maps";
@@ -13,16 +13,26 @@ export interface RunningInfo {
     calories: number;
     coordinates: Coordinates[];
     distance: number; // meters
+    pace: string;
 }
 
 var timerInterval: any = null;
 
-const runningEmptyState = { isRunning: false, start_time: null, end_time: null, calories: 0, coordinates: [], distance: 0 } ;
+const runningEmptyState = { isRunning: false, start_time: null, end_time: null, calories: 0, coordinates: [], distance: 0, pace: '00:00' } ;
 
 const useRunning = () => {
     const [runningInfo, setActiveRunningState] = useState<RunningInfo>(runningEmptyState);
     const [runningHistory, setHistoryState] = useState<RunningInfo[]>([]);
     const [runningTime, setRunningTime] = useState('00:00');
+
+    useEffect(() => {
+        if(runningInfo.start_time){ 
+            setActiveRunningState({
+                ...runningInfo,
+                pace: getPace(runningInfo.distance,runningInfo.start_time)
+            });
+        }
+    },[runningInfo.distance])
 
     async function setupHistory(){
         const history = await getData('runningHistory');

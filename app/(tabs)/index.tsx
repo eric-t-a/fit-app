@@ -47,7 +47,8 @@ export default function HomeScreen() {
           distance={runningInfo.distance} 
           calories={runningInfo.calories}
           start_time={runningInfo.start_time}
-          />
+          pace={runningInfo.pace}
+        />
         
         <Map 
           ref={mapRef}

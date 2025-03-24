@@ -9,9 +9,10 @@ interface RunningInfoProps{
     distance: number;
     calories: number;
     start_time: null | Date;
+    pace: string;
 }
 
-const RunningInfoView = ({ runningTime, distance, calories, start_time }: RunningInfoProps) => {
+const RunningInfoView = ({ runningTime, distance, calories, start_time, pace }: RunningInfoProps) => {
     const insets = useSafeAreaInsets();
 
     return(
@@ -40,7 +41,7 @@ const RunningInfoView = ({ runningTime, distance, calories, start_time }: Runnin
             </View>
             <View style={styles.infoBlock}>
                 <Text style={{...styles.infoTextValue, ...styles.infoText}}>
-                    {start_time ? getPace(distance,start_time) : '00:00'}
+                    {start_time ? pace : '00:00'}
                 </Text>
                 <Text style={styles.infoText}>
                     min/km
