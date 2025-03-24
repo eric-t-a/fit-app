@@ -83,7 +83,7 @@ function calculateCalories(distance: number, time: number, weight: number){ // m
     const speed = distance / time;
     const mets = getMets(speed);
 
-    return mets * weight * time / 60;
+    return mets * weight * time / 3600;
 }
 function getPace(distance: number, start_time: Date){
     if(!start_time) return '00:00';
