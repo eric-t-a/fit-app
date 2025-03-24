@@ -4,8 +4,11 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-interface RunningInfoProps extends RunningInfo{
+interface RunningInfoProps{
     runningTime: string;
+    distance: number;
+    calories: number;
+    start_time: null | Date;
 }
 
 const RunningInfoView = ({ runningTime, distance, calories, start_time }: RunningInfoProps) => {

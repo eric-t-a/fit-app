@@ -81,7 +81,6 @@ const useRunning = () => {
             calories: runningInfo.calories + Math.floor(deltaCalories),
             distance: runningInfo.distance + deltaDistance,
             isRunning: true, 
-            start_time: timeNow, 
             coordinates: [...runningInfo.coordinates, {...coord, time: new Date()}]
         });
     }

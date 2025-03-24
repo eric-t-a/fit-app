@@ -86,14 +86,14 @@ function calculateCalories(distance: number, time: number, weight: number){ // m
     return mets * weight * time / 3600;
 }
 function getPace(distance: number, start_time: Date){
-    if(!start_time) return '00:00';
+    if(!start_time || !distance) return '00:00';
     const pace = calculatePace(distance, start_time);
 
     return formatTime(pace);
 }
 function calculatePace(distance: number, start_time: Date){
     const timeDeltaSeconds = Math.floor(((new Date()).getTime() - start_time.getTime()) / 1000);
-    const timeDeltaMin = timeDeltaSeconds / 60;
+    const timeDeltaMin = timeDeltaSeconds;
     const distanceKm = distance / 1000;
 
     return Math.floor(timeDeltaMin / distanceKm);

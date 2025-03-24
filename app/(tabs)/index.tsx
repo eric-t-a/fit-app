@@ -42,7 +42,12 @@ export default function HomeScreen() {
     
       <View style={{...styles.container, paddingTop: insets.top}}>
 
-        <RunningInfoView runningTime={runningTime} distance={runningInfo.distance} calories={runningInfo.calories}/>
+        <RunningInfoView 
+          runningTime={runningTime} 
+          distance={runningInfo.distance} 
+          calories={runningInfo.calories}
+          start_time={runningInfo.start_time}
+          />
         
         <Map 
           ref={mapRef}
