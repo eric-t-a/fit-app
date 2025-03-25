@@ -87,6 +87,18 @@ const RightBar = ({ open, setOpen, children }: Props) => {
         if(nativeEvent.absoluteX > windowWidth / 2){
             onClosePanel(nativeEvent.absoluteX)
         }
+        else{
+            Animated.timing(absoluteX, {
+                toValue: 0.2*windowWidth,
+                duration: transitionTime,
+                useNativeDriver: false,
+            }).start();
+            Animated.timing(backgroundOpacity, {
+                toValue: 0.5,
+                duration: transitionTime,
+                useNativeDriver: false,
+            }).start();
+        }
     }
 
 
@@ -115,6 +127,7 @@ const RightBar = ({ open, setOpen, children }: Props) => {
                             ...styles.innerContainer, 
                             marginTop: insets.top,
                             left: absoluteX,
+                            paddingRight: windowWidth*0.2 + 24
                         }}
                     >
                         {children}
@@ -153,7 +166,7 @@ const styles = StyleSheet.create({
         width: '100%',
         right: 0,
         top: -24,
-        paddingRight: '20%'
+        padding: 24,
     }
 });
 export default RightBar;
