@@ -1,3 +1,4 @@
+import { setHistoryState, setupHistory } from "@/store/runningHistory";
 import { RunningInfo, setActiveRunningState } from "@/store/runningInfo";
 import store from "@/store/store";
 import { calculateCalories, floatTo1Decimal, getDistanceFromLatLonInMeters, getPace, timeRunning } from "@/utils/helper";
@@ -42,8 +43,8 @@ function appendCoordinates(coord: LatLng){
 
 const useRunning = () => {
     const runningInfo = useSelector(state => state.runningInfo);
+    const runningHistory = useSelector(state => state.runningHistory);
     const dispatch = useDispatch();
-    const [runningHistory, setHistoryState] = useState<RunningInfo[]>([]);
     const [runningTime, setRunningTime] = useState('00:00');
 
     useEffect(() => {
@@ -55,9 +56,9 @@ const useRunning = () => {
         }
     },[runningInfo.distance])
 
-    async function setupHistory(){
+    async function setupHistory() {
         const history = await getData('runningHistory');
-        setHistoryState(history ?? []);
+        dispatch(setHistoryState(history ?? []));
     }
 
     useEffect(() => {
@@ -65,7 +66,7 @@ const useRunning = () => {
     },[])
 
     function setHistoryRunningInfo(history: RunningInfo[]){
-        setHistoryState([...history]);
+        dispatch(setHistoryState([...history]));
         storeData('runningHistory', [...history]);
     }
     function appendInfoToHistory(info: RunningInfo){

@@ -1,18 +1,23 @@
-import { Image, StyleSheet, Platform, View, TouchableOpacity, Text, StatusBar } from 'react-native';
+import { Image, StyleSheet, Platform, View, TouchableOpacity, Text, StatusBar, Dimensions } from 'react-native';
 import Map, { MapPolyline, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import useLocation from '@/hooks/useLocation';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import useRunning from '@/hooks/useRunning';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import RunningInfoView from '@/components/RunningInfo';
 import { getData } from '@/utils/storage';
+import RightBar from '@/components/RightBar';
+import { Line, Svg } from 'react-native-svg';
+import { getMaxMinCoordinates } from '@/utils/helper';
+import { useSelector } from 'react-redux';
 
 export default function HomeScreen() {
   const { currentPosition, errorMsg } = useLocation();
   const mapRef : any = React.createRef();
   const { runningInfo, runningHistory, startRunning, appendCoordinates, stopRunning, runningTime } = useRunning();
   const insets = useSafeAreaInsets();
+  const [listOpen, setListOpen] = useState(false);
 
 
   useEffect(() => {
@@ -23,11 +28,6 @@ export default function HomeScreen() {
       longitudeDelta: 0.001
     })
   },[currentPosition.latitude, currentPosition.longitude]);
-
-  useEffect(() => {
-    if(runningInfo.isRunning) appendCoordinates(currentPosition);
-    
-  }, [runningInfo.isRunning, currentPosition])
 
   function startStopRun(){
     if(runningInfo.isRunning){ 
@@ -41,13 +41,14 @@ export default function HomeScreen() {
     <View style={{flex: 1}}>
     
       <View style={{...styles.container, paddingTop: insets.top}}>
-
+        <SideBarList listOpen={listOpen} setListOpen={setListOpen} runningHistory={runningHistory}/>
         <RunningInfoView 
           runningTime={runningTime} 
           distance={runningInfo.distance} 
           calories={runningInfo.calories}
           start_time={runningInfo.start_time}
           pace={runningInfo.pace}
+          setListOpen={setListOpen}
         />
         
         <Map 
@@ -80,6 +81,43 @@ export default function HomeScreen() {
     </View>
   );
 }
+
+const SideBarList = React.memo(({listOpen, setListOpen}) => {
+  const windowWidth = Dimensions.get('window').width;
+  const runningHistory = useSelector(state => state.runningHistory);
+
+  return(
+    <RightBar open={listOpen} setOpen={setListOpen}>
+      {runningHistory.map((history, i) => {
+        const { maxLat, minLat, maxLong, minLong } = getMaxMinCoordinates(history.coordinates);
+        const widthNormalizer = 0.8*windowWidth - 48;
+        const heightNormalizer = 0.5*windowWidth;
+
+        return(
+          <View key={i} style={{width: '100%'}}>
+            <Text style={{color: 'white'}}>oi</Text>
+            <Svg height={heightNormalizer} width={widthNormalizer}>
+              {history.coordinates.map((coord, i) => {
+                if(i == history.coordinates.length - 1) return;
+
+                const next = history.coordinates[i+1];
+                
+                let latStart = (coord.latitude - minLat) * heightNormalizer / (maxLat - minLat);
+                let latEnd = (next.latitude - minLat) * heightNormalizer / (maxLat - minLat);
+                let longStart = (coord.longitude - minLong) * widthNormalizer / (maxLong - minLong);
+                let longEnd = (next.longitude - minLong) * widthNormalizer / (maxLong - minLong);
+
+                return(
+                  <Line key={i} x1={longStart} y1={latStart} x2={longEnd} y2={latEnd} stroke="red" strokeWidth="2" />
+                );
+              })}
+            </Svg>
+          </View>
+        );
+      })}
+    </RightBar>
+  );
+})
 
 const styles = StyleSheet.create({
   container: {

@@ -1,3 +1,4 @@
+import { Coordinates } from "@/store/runningInfo";
 import { LatLng } from "react-native-maps";
 
 function formatTime(totalSec: number){
@@ -99,7 +100,37 @@ function calculatePace(distance: number, start_time: Date){
     return Math.floor(timeDeltaMin / distanceKm);
 
 }
+function getMaxMinCoordinates(coords: LatLng[] | Coordinates[]){
+    let maxLat = -999;
+    let maxLong = -999;
+    let minLat = 999;
+    let minLong = 999;
+    coords.forEach((coord) => {
+      if(coord.latitude > maxLat && coord.latitude < minLat){
+        maxLat = coord.latitude;
+        minLat = coord.latitude;
+      }
+      if(coord.latitude < minLat){
+        minLat = coord.latitude;
+      }
+      if(coord.latitude > maxLat){
+        maxLat = coord.latitude;
+      }
 
+      if(coord.longitude > maxLong && coord.longitude < minLong){
+        maxLong = coord.longitude;
+        minLong = coord.longitude;
+      }
+      if(coord.longitude > maxLong){
+        maxLong = coord.longitude;
+      }
+      if(coord.longitude < minLong){
+        minLong = coord.longitude;
+      }
+    });
+
+    return { maxLat, minLat, maxLong, minLong };
+}
 export { 
     timeRunning, 
     shouldUpdateCoordinates, 
@@ -107,5 +138,6 @@ export {
     floatTo1Decimal, 
     floatTo2Decimal, 
     calculateCalories,
-    getPace
+    getPace,
+    getMaxMinCoordinates
 }
