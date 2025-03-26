@@ -12,7 +12,7 @@ export interface RunningInfo {
   distance: number; // meters
   pace: string;
 }
-interface Coordinates extends LatLng {
+export interface Coordinates extends LatLng {
   time: Date;
 }
 
