@@ -15,9 +15,9 @@ const RightBar = ({ open, setOpen, children }: Props) => {
     const insets = useSafeAreaInsets();
 
     const windowWidth = Dimensions.get('window').width;
-    const absoluteX = new Animated.Value(windowWidth);
+    const absoluteX = new Animated.Value(open ? 0.2*windowWidth: windowWidth);
 
-    const backgroundOpacity = new Animated.Value(0);
+    const backgroundOpacity = new Animated.Value(open ? 0.5 : 0);
 
     const containerRef = useRef<typeof View | null>(null);
 
@@ -61,7 +61,7 @@ const RightBar = ({ open, setOpen, children }: Props) => {
             setOpen(false);
         });
     }
-
+    
     useEffect(() => {
         if(open) onOpenPanel();
     },[open])
@@ -118,6 +118,7 @@ const RightBar = ({ open, setOpen, children }: Props) => {
                         ...styles.leftSide, 
                         marginTop: insets.top
                     }}
+                    activeOpacity={0.9}
                 >
                     <Animated.View style={{...styles.animatedLeftSideBg, opacity: backgroundOpacity}}/>
                 </TouchableOpacity>
