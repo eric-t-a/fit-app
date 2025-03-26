@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "config": {
         "googleMapsApiKey": "teste"
-      }
+      },
+      "bundleIdentifier": "com.ericthomas.fitapp"
     },
     "android": {
       "adaptiveIcon": {
@@ -48,9 +49,20 @@
         }
       ],
       [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableProguardInReleaseBuilds": false
+          }
+        }
+      ],
+      [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow fit-app to use your location"
+          "locationAlwaysAndWhenInUsePermission": "Allow fit-app to use your location",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
         }
       ]
     ],
