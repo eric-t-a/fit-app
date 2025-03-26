@@ -1,36 +1,57 @@
+import { RunningInfo, setActiveRunningState } from "@/store/runningInfo";
+import store from "@/store/store";
 import { calculateCalories, floatTo1Decimal, getDistanceFromLatLonInMeters, getPace, timeRunning } from "@/utils/helper";
 import { getData, storeData } from "@/utils/storage";
 import { useEffect, useState } from "react";
 import { LatLng } from "react-native-maps";
+import { useDispatch, useSelector } from "react-redux";
 
-interface Coordinates extends LatLng {
-    time: Date;
-}
-export interface RunningInfo {
-    isRunning: boolean;
-    start_time: null | Date;
-    end_time: null | Date;
-    calories: number;
-    coordinates: Coordinates[];
-    distance: number; // meters
-    pace: string;
-}
+
 
 var timerInterval: any = null;
 
 const runningEmptyState = { isRunning: false, start_time: null, end_time: null, calories: 0, coordinates: [], distance: 0, pace: '00:00' } ;
 
+function setRunningInfo(info: RunningInfo){
+    store.dispatch(setActiveRunningState({...info}));
+    storeData('runningInfo', {...info});
+}
+
+function appendCoordinates(coord: LatLng){
+    const runningInfo = store.getState().runningInfo;
+    let deltaDistance = 0;
+    let deltaCalories = 0;
+    const timeNow = new Date();
+    if(runningInfo.coordinates.length){
+        const lastCoord = runningInfo.coordinates[runningInfo.coordinates.length - 1];
+        const deltaTime = Math.floor((timeNow.getTime() - lastCoord.time.getTime()) / 1000); // seconds
+
+        deltaDistance = getDistanceFromLatLonInMeters(lastCoord.latitude, lastCoord.longitude, coord.latitude, coord.longitude);
+        deltaDistance = floatTo1Decimal(deltaDistance)
+
+        deltaCalories = calculateCalories(deltaDistance, deltaTime, 70);
+    }
+    setRunningInfo({
+        ...runningInfo, 
+        calories: runningInfo.calories + Math.floor(deltaCalories),
+        distance: runningInfo.distance + deltaDistance,
+        isRunning: true, 
+        coordinates: [...runningInfo.coordinates, {...coord, time: new Date()}]
+    });
+}
+
 const useRunning = () => {
-    const [runningInfo, setActiveRunningState] = useState<RunningInfo>(runningEmptyState);
+    const runningInfo = useSelector(state => state.runningInfo);
+    const dispatch = useDispatch();
     const [runningHistory, setHistoryState] = useState<RunningInfo[]>([]);
     const [runningTime, setRunningTime] = useState('00:00');
 
     useEffect(() => {
         if(runningInfo.start_time){ 
-            setActiveRunningState({
+            dispatch(setActiveRunningState({
                 ...runningInfo,
                 pace: getPace(runningInfo.distance,runningInfo.start_time)
-            });
+            }));
         }
     },[runningInfo.distance])
 
@@ -43,10 +64,6 @@ const useRunning = () => {
         setupHistory();
     },[])
 
-    function setRunningInfo(info: RunningInfo){
-        setActiveRunningState({...info});
-        storeData('runningInfo', {...info});
-    }
     function setHistoryRunningInfo(history: RunningInfo[]){
         setHistoryState([...history]);
         storeData('runningHistory', [...history]);
@@ -73,27 +90,7 @@ const useRunning = () => {
         setRunningInfo({...runningEmptyState})
     }
 
-    function appendCoordinates(coord: LatLng){
-        let deltaDistance = 0;
-        let deltaCalories = 0;
-        const timeNow = new Date();
-        if(runningInfo.coordinates.length){
-            const lastCoord = runningInfo.coordinates[runningInfo.coordinates.length - 1];
-            const deltaTime = Math.floor((timeNow.getTime() - lastCoord.time.getTime()) / 1000); // seconds
 
-            deltaDistance = getDistanceFromLatLonInMeters(lastCoord.latitude, lastCoord.longitude, coord.latitude, coord.longitude);
-            deltaDistance = floatTo1Decimal(deltaDistance)
-
-            deltaCalories = calculateCalories(deltaDistance, deltaTime, 70);
-        }
-        setRunningInfo({
-            ...runningInfo, 
-            calories: runningInfo.calories + Math.floor(deltaCalories),
-            distance: runningInfo.distance + deltaDistance,
-            isRunning: true, 
-            coordinates: [...runningInfo.coordinates, {...coord, time: new Date()}]
-        });
-    }
 
     useEffect(() => {
         if(runningInfo.isRunning){
@@ -108,4 +105,5 @@ const useRunning = () => {
 
 }
 
+export { appendCoordinates };
 export default useRunning;
